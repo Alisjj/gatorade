@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/alisjj/gatorade/internal/config"
+	"github.com/alisjj/gatorade/internal/database"
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -14,12 +17,19 @@ func main() {
 		fmt.Printf("Error")
 	}
 
-	s := &state{cfg: &data}
+	db, err := sql.Open("postgres", data.DbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbQueries := database.New(db)
+
+	s := &state{cfg: &data, db: dbQueries}
 	// var cmds commands
 	cmds := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")

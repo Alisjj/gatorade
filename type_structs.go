@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/alisjj/gatorade/internal/config"
+	"github.com/alisjj/gatorade/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
