@@ -82,3 +82,18 @@ func handlerGetUsers(s *state, cmd command) error {
 	}
 	return nil
 }
+
+func handlerAgg(_ *state, cmd command) error {
+	if len(cmd.args) != 0 {
+		return fmt.Errorf("error: agg command expects zero args")
+	}
+
+	ctx := context.Background()
+	url := "https://www.wagslane.dev/index.xml"
+	feed, err := fetchFeed(ctx, url)
+	if err != nil {
+		return err
+	}
+	fmt.Println(feed)
+	return nil
+}
