@@ -30,7 +30,7 @@ func handlerLogin(s *state, cmd command) error {
 
 func handlerRegister(s *state, cmd command) error {
 	if len(cmd.args) != 1 {
-		return fmt.Errorf("error: login handler expects a username")
+		return fmt.Errorf("error: register handler expects a username")
 	}
 
 	ctx := context.Background()
@@ -42,8 +42,22 @@ func handlerRegister(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
-	s.cfg.CurrentUserName = c_user.Name
+	if err := s.cfg.SetUser(c_user.Name); err != nil {
+		return err
+	}
 	fmt.Println("User has been created!")
 	fmt.Println(c_user)
+	return nil
+}
+
+func handlerReset(s *state, cmd command) error {
+	if len(cmd.args) != 0 {
+		return fmt.Errorf("error: reset handler expects a username")
+	}
+
+	ctx := context.Background()
+	if err := s.db.ReserDB(ctx); err != nil {
+		return err
+	}
 	return nil
 }
