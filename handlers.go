@@ -56,7 +56,10 @@ func handlerReset(s *state, cmd command) error {
 	}
 
 	ctx := context.Background()
-	if err := s.db.ReserDB(ctx); err != nil {
+	if err := s.db.ResetUsers(ctx); err != nil {
+		return err
+	}
+	if err := s.db.ResetFeeds(ctx); err != nil {
 		return err
 	}
 	return nil
@@ -95,5 +98,44 @@ func handlerAgg(_ *state, cmd command) error {
 		return err
 	}
 	fmt.Println(feed)
+	return nil
+}
+
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.args) != 2 {
+		return fmt.Errorf("error: addfeed requries two arguments")
+	}
+
+	uid := uuid.New()
+	ctx := context.Background()
+	name := cmd.args[0]
+	url := cmd.args[1]
+	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return nil
+	}
+	user_id := user.ID
+	feed, err := s.db.CreateFeed(ctx, database.CreateFeedParams{ID: uid, Name: name, UserID: user_id, Url: url, CreatedAt: time.Now(), UpdatedAt: time.Now()})
+	if err != nil {
+		return err
+	}
+	fmt.Println(feed)
+	return nil
+}
+
+func handlerFeeds(s *state, cmd command) error {
+	if len(cmd.args) != 0 {
+		return fmt.Errorf("error: feeds doesn't require any arguments")
+	}
+
+	ctx := context.Background()
+	feeds, err := s.db.GetFeeds(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, feed := range feeds {
+		fmt.Printf("%v, %v, %v\n", feed.Name, feed.Url, feed.Username)
+	}
 	return nil
 }
