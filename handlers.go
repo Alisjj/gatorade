@@ -52,12 +52,29 @@ func handlerRegister(s *state, cmd command) error {
 
 func handlerReset(s *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("error: reset handler expects a username")
+		return fmt.Errorf("error: reset expects zero args")
 	}
 
 	ctx := context.Background()
 	if err := s.db.ReserDB(ctx); err != nil {
 		return err
+	}
+	return nil
+}
+
+func handlerGetUsers(s *state, cmd command) error {
+	if len(cmd.args) != 0 {
+		return fmt.Errorf("error: users command expects zero args")
+	}
+
+	ctx := context.Background()
+
+	users, err := s.db.GetUsers(ctx)
+	if err != nil {
+		return err
+	}
+	for _, u := range users {
+		fmt.Printf("* %s", u.Name)
 	}
 	return nil
 }
