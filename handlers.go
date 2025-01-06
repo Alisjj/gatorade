@@ -11,7 +11,7 @@ import (
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) != 1 {
-		return fmt.Errorf("error: login handler expects a username")
+		return fmt.Errorf("login handler expects a username")
 	}
 	ctx := context.Background()
 
@@ -30,7 +30,7 @@ func handlerLogin(s *state, cmd command) error {
 
 func handlerRegister(s *state, cmd command) error {
 	if len(cmd.args) != 1 {
-		return fmt.Errorf("error: register handler expects a username")
+		return fmt.Errorf("register handler expects a username")
 	}
 
 	ctx := context.Background()
@@ -52,7 +52,7 @@ func handlerRegister(s *state, cmd command) error {
 
 func handlerReset(s *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("error: reset expects zero args")
+		return fmt.Errorf("reset expects zero args")
 	}
 
 	ctx := context.Background()
@@ -67,7 +67,7 @@ func handlerReset(s *state, cmd command) error {
 
 func handlerGetUsers(s *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("error: users command expects zero args")
+		return fmt.Errorf("users command expects zero args")
 	}
 
 	ctx := context.Background()
@@ -88,7 +88,7 @@ func handlerGetUsers(s *state, cmd command) error {
 
 func handlerAgg(_ *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("error: agg command expects zero args")
+		return fmt.Errorf("agg command expects zero args")
 	}
 
 	ctx := context.Background()
@@ -103,7 +103,7 @@ func handlerAgg(_ *state, cmd command) error {
 
 func handlerAddFeed(s *state, cmd command) error {
 	if len(cmd.args) != 2 {
-		return fmt.Errorf("error: addfeed requries two arguments")
+		return fmt.Errorf("addfeed requries two arguments")
 	}
 
 	uid := uuid.New()
@@ -125,7 +125,7 @@ func handlerAddFeed(s *state, cmd command) error {
 
 func handlerFeeds(s *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("error: feeds doesn't require any arguments")
+		return fmt.Errorf("feeds doesn't require any arguments")
 	}
 
 	ctx := context.Background()
@@ -137,5 +137,48 @@ func handlerFeeds(s *state, cmd command) error {
 	for _, feed := range feeds {
 		fmt.Printf("%v, %v, %v\n", feed.Name, feed.Url, feed.Username)
 	}
+	return nil
+}
+
+func handlerFollow(s *state, cmd command) error {
+	if len(cmd.args) != 1 {
+		return fmt.Errorf("follow only required one argument, <url>")
+	}
+	ctx := context.Background()
+	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	feed, err := s.db.GetFeed(ctx, cmd.args[0])
+	if err != nil {
+		return err
+	}
+	follows, err := s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{ID: uuid.New(), UserID: user.ID, FeedID: feed.ID, CreatedAt: time.Now(), UpdatedAt: time.Now()})
+	if err != nil {
+		return err
+	}
+
+	for _, follow := range follows {
+		fmt.Println(follow)
+	}
+	return nil
+
+}
+
+func handlerFollows(s *state, cmd command) error {
+	if len(cmd.args) != 0 {
+		return fmt.Errorf("follows doesnt require any arguments")
+	}
+	ctx := context.Background()
+	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	follows, err := s.db.GetFeedFollowsForUser(ctx, user.ID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(follows)
 	return nil
 }
