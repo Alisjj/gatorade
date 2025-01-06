@@ -119,6 +119,10 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
+	_, err = s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{ID: uuid.New(), UserID: user.ID, FeedID: feed.ID, CreatedAt: time.Now(), UpdatedAt: time.Now()})
+	if err != nil {
+		return err
+	}
 	fmt.Println(feed)
 	return nil
 }
