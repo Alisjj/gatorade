@@ -169,9 +169,9 @@ func handlerFollow(s *state, cmd command) error {
 
 }
 
-func handlerFollows(s *state, cmd command) error {
+func handlerFollowing(s *state, cmd command) error {
 	if len(cmd.args) != 0 {
-		return fmt.Errorf("follows doesnt require any arguments")
+		return fmt.Errorf("following doesn't require any arguments")
 	}
 	ctx := context.Background()
 	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)

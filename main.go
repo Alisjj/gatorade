@@ -36,7 +36,7 @@ func main() {
 	cmds.register("addfeed", handlerAddFeed)
 	cmds.register("feeds", handlerFeeds)
 	cmds.register("follow", handlerFollow)
-	cmds.register("follows", handlerFollows)
+	cmds.register("following", handlerFollowing)
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")
@@ -49,7 +49,7 @@ func main() {
 
 	err = cmds.run(s, cmd)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error: %v", err)
 		return
 	}
 
